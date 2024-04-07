@@ -6,11 +6,12 @@ function bat = run_network(G,bat)
 % path.
 
 MAX_bat=1000;
-bat_eme=0.2;
-EM=0.03;
-ET=0.2;
-ER=0.02;
-maxpaths=100;
+a=10;
+bat_eme=0.2*a;
+EM=0.03*a;
+ET=0.2*a;
+ER=0.02*a;
+maxpaths=50;
 
 N=numnodes(G);
 
@@ -22,7 +23,7 @@ k = K(randi([1 numel(K)]));
 %paths = paths(1:maxpaths);
 
 check_minbat= Inf(size(paths,1),1);        %mat check if a node's energy is lower than 50%
-check_ec=zeros(size(paths,1),1);             %mat that get energy consume of paths 
+%check_ec=zeros(size(paths,1),1);             %mat that get energy consume of paths 
 
 %% check lowest battery node in the path
 E = E_consumption(G);
@@ -37,6 +38,7 @@ end
 path = paths{path_index};
 
 %% check path total energy consumption
+%{
 for i=1:size(paths,1)                       % check every path              {i} is index of paths
     for j = 2: numel(paths{i})              % check every nodes in a path   (j) is index of node in that paths
         if j==1                             % path{i}(j) la j-th node in i-th path
@@ -48,7 +50,7 @@ for i=1:size(paths,1)                       % check every path              {i} 
         end
     end
 end
-%{
+%% if not, take the shortest path
 if sum(sum(check_minbat))==0
     [~,path_index]=max(check_ec);          % if all paths have node < 50, take the less e_consum path
     path = paths{path_index};
@@ -66,5 +68,7 @@ if(path)
            bat(path(i)) = bat(path(i))-(EM+ER*G.Edges.Weight(findedge(G,path(i-1),path(i)))+ET*G.Edges.Weight(findedge(G,path(i+1),path(i)))) ; 
         end
     end
+else
+    disp('lost packet')
 end
 
